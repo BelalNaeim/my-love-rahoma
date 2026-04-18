@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - إدارة الذكريات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #d90429;
+            --bg-color: #f8f9fa;
+            --white: #ffffff;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: var(--primary-color);
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Cairo', sans-serif;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+            font-family: 'Cairo', sans-serif;
+        }
+        .btn:hover {
+            background-color: #b0001f;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #a71d2a;
+        }
+        
+        .slides-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        .slide-item {
+            display: flex;
+            align-items: center;
+            background: #f1f3f5;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        .slide-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .slide-info {
+            flex-grow: 1;
+        }
+        #loginSection {
+            text-align: center;
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        #adminPanel {
+            display: none;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+    <!-- Login -->
+    <div class="container" id="loginSection">
+        <h1>تسجيل الدخول للوحة التحكم</h1>
+        <div class="form-group">
+            <input type="password" id="adminPassword" placeholder="أدخل كلمة المرور" />
+        </div>
+        <button class="btn" onclick="login()">دخول</button>
+        <p id="loginError" style="color: red; display: none; margin-top: 10px;">كلمة المرور خاطئة!</p>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="container" id="adminPanel">
+        <h1>إدارة المحتوى</h1>
+        <button class="btn" onclick="logout()" style="float: left; margin-bottom:20px; background-color:#6c757d;">تسجيل خروج</button>
+        <div style="clear: both;"></div>
+
+        <div id="statusMessage" class="message"></div>
+
+        <!-- Text Content -->
+        <section style="margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
+            <h2>النصوص الأساسية</h2>
+            <div class="form-group">
+                <label>العنوان الفرعي</label>
+                <input type="text" id="heroSubtitle" />
+            </div>
+            <div class="form-group">
+                <label>نص رسالة الحب</label>
+                <textarea id="loveText"></textarea>
+            </div>
+            <button class="btn" onclick="updateTexts()">حفظ النصوص</button>
+        </section>
+
+        <!-- Slides Management -->
+        <section>
+            <h2>إدارة الصور والذكريات</h2>
+            
+            <div style="background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <h3>إضافة صورة جديدة</h3>
+                <form id="addSlideForm" onsubmit="addSlide(event)">
+                    <div class="form-group">
+                        <label>اختر صورة من جهازك:</label>
+                        <input type="file" id="slideImage" accept="image/*" required />
+                    </div>
+                    <div class="form-group">
+                        <label>أو رابط الصورة (URL):</label>
+                        <input type="text" id="slideImageUrl" placeholder="http://..." />
+                        <small style="color:#666">إذا قمت برفع صورة من جهازك سيتم تجاهل هذا الرابط.</small>
+                    </div>
+                    <div class="form-group">
+                        <label>التعليق على الصورة:</label>
+                        <input type="text" id="slideCaption" required />
+                    </div>
+                    <button type="submit" class="btn">رفع وإضافة</button>
+                </form>
+            </div>
+
+            <h3>الصور الحالية</h3>
+            <ul class="slides-list" id="slidesList">
+                <!-- Slides will be loaded here -->
+            </ul>
+        </section>
+    </div>
+
+    <script>
+        let currentPassword = '';
+
+        function showMessage(msg, isError = false) {
+            const el = document.getElementById('statusMessage');
+            el.textContent = msg;
+            el.className = 'message ' + (isError ? 'error' : 'success');
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
+        }
+
+        async function login() {
+            const pwd = document.getElementById('adminPassword').value;
+            if(!pwd) return;
+
+            // Try fetching content to verify (text endpoint)
+            const res = await fetch('/api/content');
+            if(res.ok) {
+                currentPassword = pwd;
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadData();
+            }
+        }
+
+        function logout() {
+            currentPassword = '';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch('/api/content');
+                const data = await res.json();
+                
+                document.getElementById('heroSubtitle').value = data.heroSubtitle || '';
+                document.getElementById('loveText').value = data.loveText || '';
+
+                renderSlides(data.slides || []);
+            } catch (e) {
+                console.error("Error loading data", e);
+            }
+        }
+
+        function renderSlides(slides) {
+            const list = document.getElementById('slidesList');
+            list.innerHTML = '';
+            slides.forEach((slide, index) => {
+                list.innerHTML += `
+                    <li class="slide-item">
+                        <img src="${slide.src}" alt="Slide ${index}">
+                        <div class="slide-info">
+                            <strong>${slide.caption}</strong>
+                            <div style="color: #666; font-size:12px;">المسار: ${slide.src}</div>
+                        </div>
+                        <button class="btn btn-danger" onclick="deleteSlide(${index})">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </li>
+                `;
+            });
+        }
+
+        async function updateTexts() {
+            const heroSubtitle = document.getElementById('heroSubtitle').value;
+            const loveText = document.getElementById('loveText').value;
+
+            try {
+                const res = await fetch('/api/content/text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: currentPassword, heroSubtitle, loveText })
+                });
+                
+                const data = await res.json();
+                if(res.ok) {
+                    showMessage('تم حفظ النصوص بنجاح!');
+                } else {
+                    showMessage(data.error || 'فشل في حفظ النصوص', true);
+                    if(res.status === 401) logout();
+                }
+            } catch (e) {
+                showMessage('خطأ في الاتصال بالخادم', true);
+            }
+        }
+
+        async function addSlide(e) {
+            e.preventDefault();
+            const caption = document.getElementById('slideCaption').value;
+            const imageFile = document.getElementById('slideImage').files[0];
+            const imageUrl = document.getElementById('slideImageUrl').value;
+
+            const formData = new FormData();
+            formData.append('password', currentPassword);
+            formData.append('caption', caption);
+            
+            if (imageFile) {
+                formData.append('image', imageFile);
+            } else if (imageUrl) {
+                formData.append('imageUrl', imageUrl);
+            } else {
+                showMessage('يجب اختيار صورة أو وضع رابط!', true);
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/content/slide', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                
+                if(res.ok) {
+                    showMessage('تم إضافة الصورة بنجاح!');
+                    document.getElementById('addSlideForm').reset();
+                    loadData();
+                } else {
+                    showMessage(data.error || 'فشل في الإضافة', true);
+                    if(res.status === 401) logout();
+                }
+            } catch (e) {
+                showMessage('خطأ في الاتصال بالخادم', true);
+            }
+        }
+
+        async function deleteSlide(index) {
+            if(!confirm('هل أنت متأكد من حذف هذه الصورة؟')) return;
+
+            try {
+                const res = await fetch('/api/content/slide/' + index, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-admin-password': currentPassword
+                    }
+                });
+                
+                if(res.ok) {
+                    showMessage('تم الحذف بنجاح!');
+                    loadData();
+                } else {
+                    showMessage('فشل في الحذف', true);
+                    if(res.status === 401) logout();
+                }
+            } catch (e) {
+                showMessage('خطأ في الاتصال بالخادم', true);
+            }
+        }
+    </script>
+</body>
+</html>

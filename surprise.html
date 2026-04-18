@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مفاجأة لحبيبتي</title>
+    <!-- Google Fonts for Arabic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #ffccd5, #ffe6f0);
+            overflow: hidden;
+            font-family: 'Cairo', sans-serif;
+        }
+        .mail-wrapper {
+            position: relative;
+            width: 220px;
+            height: 160px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2;
+            animation: tiltBounce 2s infinite ease-in-out;
+            transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .mail-wrapper:hover {
+            animation: none; /* Stop tilting on hover */
+            transform: scale(1.05); /* Slight zoom on hover */
+        }
+        .mail-wrapper.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        @keyframes tiltBounce {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+        .mail-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            transform: rotate(180deg);
+            width: 210px;
+            height: 60px;
+            background: #e74c3c;
+            clip-path: polygon(50% 0, 100% 100%, 0 100%);
+        }
+        .heart {
+            font-size: 50px;
+            transition: transform 0.3s ease-in-out;
+        }
+        .mail-wrapper:hover .heart {
+            transform: scale(1.2);
+        }
+        .letter {
+            position: absolute;
+            padding: 20px;
+            width: 280px;
+            min-height: 200px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(0) scale(0.5);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            z-index: 1; /* Appear behind the mail wrapper initially */
+            pointer-events: none;
+        }
+        .letter.show {
+            transform: translateY(0) scale(1); /* Center on screen */
+            opacity: 1;
+            z-index: 3; /* Bring above everything */
+            pointer-events: auto;
+        }
+        .letter h2 {
+            font-family: 'Aref Ruqaa', serif;
+            color: #d90429;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .letter p {
+            font-size: 18px;
+            color: #444;
+            text-align: center;
+            padding: 10px;
+            line-height: 1.6;
+            font-weight: bold;
+        }
+        .letter .small-hearts {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .letter .small-hearts span {
+            font-size: 24px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .letter .small-hearts span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .letter .small-hearts span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .heart-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .heart-rain span {
+            position: absolute;
+            bottom: 100%;
+            font-size: 24px;
+            opacity: 0.9;
+            animation: fall linear forwards; /* Use forwards so they don't jump back */
+        }
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .back-btn {
+            position: absolute;
+            bottom: -50px;
+            padding: 8px 20px;
+            background: #d90429;
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: 0.3s;
+            opacity: 0;
+        }
+        
+        .letter.show .back-btn {
+            animation: fadeIn 0.5s forwards 1s; /* Appeat slightly after letter */
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        .back-btn:hover {
+            background: #ef233c;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mail-wrapper" id="mailWrapper" onclick="openLetter()">
+        <div class="heart">💌</div>
+    </div>
+
+    <div class="letter" id="letter">
+        <h2>كل عام وأنتِ حبيبتي</h2>
+        <p>"أنتِ لستِ فقط جزءاً من حياتي، بل أنتِ الحياة كلها. أحبكِ جداً 💕"</p>
+        <div class="small-hearts">
+            <span>❤️</span><span>💖</span><span>💘</span>
+        </div>
+        <a href="index.html" class="back-btn">العودة للذكريات</a>
+    </div>
+
+    <div class="heart-rain" id="heartRain"></div>
+
+    <script>
+        const heartEmojis = ['❤️', '💙', '💜', '💛', '💚', '🧡', '🤍', '💖', '💘', '💝', '💕', '💞'];
+
+        function openLetter() {
+            document.getElementById("letter").classList.add("show");
+            document.getElementById("mailWrapper").classList.add("hide");
+            startContinuousHeartRain();
+            
+            // Play a gentle sound if desired (optional)
+            // new Audio('pop.mp3').play().catch(() => {});
+        }
+
+        function startContinuousHeartRain() {
+            // Create a burst initially
+            for(let i=0; i<15; i++) {
+                setTimeout(createHeart, i * 50);
+            }
+            
+            // Then continue steadily
+            setInterval(() => {
+                createHeart();
+            }, 300); // Hearts keep falling every 300ms
+        }
+
+        function createHeart() {
+            const heartContainer = document.getElementById("heartRain");
+            const heart = document.createElement("span");
+            heart.innerHTML = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.animationDuration = (Math.random() * 3 + 3) + "s"; // Random fall speed (3 to 6s)
+            
+            // Randomly size the hearts for depth effect
+            const size = Math.random() * 20 + 15;
+            heart.style.fontSize = size + "px";
+            
+            heartContainer.appendChild(heart);
+
+            // Remove heart after it falls to free memory
+            setTimeout(() => heart.remove(), 6000);
+        }
+    </script>
+
+</body>
+</html>
