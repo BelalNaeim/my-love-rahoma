@@ -4,21 +4,29 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 
+function projectRoot() {
+    const marker = 'index.html';
+    if (fs.existsSync(path.join(__dirname, marker))) return __dirname;
+    if (fs.existsSync(path.join(process.cwd(), marker))) return process.cwd();
+    return __dirname;
+}
+
+const ROOT = projectRoot();
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, 'data.json');
+const DATA_FILE = path.join(ROOT, 'data.json');
 const ADMIN_PASSWORD = 'admin'; // Simple password for admin panel
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname)); // Serve static files from root
+app.use(express.static(ROOT)); // Serve static files from project root (Vercel bundles into cwd)
 
 // Setup multer for image uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadDir = path.join(__dirname, 'imgs', 'ras');
+        const uploadDir = path.join(ROOT, 'imgs', 'ras');
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
@@ -118,7 +126,7 @@ app.delete('/api/content/slide/:index', (req, res) => {
         const slide = data.slides[index];
         // Optionally delete the image file if it's local
         if (slide.src.startsWith('imgs/')) {
-            const filePath = path.join(__dirname, slide.src);
+            const filePath = path.join(ROOT, slide.src);
             if (fs.existsSync(filePath)) {
                try { fs.unlinkSync(filePath); } catch(e) { console.error("Could not delete file", e); }
             }
@@ -151,12 +159,12 @@ app.post('/api/content/slides', (req, res) => {
 
 // Main Page Route
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(ROOT, 'index.html'));
 });
 
 // Admin Page Route
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
+    res.sendFile(path.join(ROOT, 'admin.html'));
 });
 
 // Start Server
